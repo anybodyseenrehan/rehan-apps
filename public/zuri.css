@@ -2,3 +2,17 @@
 .history-entry { border-bottom: 1px solid #d3d9ca; }
 .history-entry .row { border-bottom: 0; gap: 6px; }
 .entry-note { margin: -5px 0 12px; color: #495c50; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; white-space: pre-wrap; }
+.journal-nav { display: flex; gap: 4px; width: fit-content; margin-top: 20px; padding: 3px; border-radius: 24px; background: #e6eadf; }
+.journal-nav a { padding: 11px 20px; border-radius: 22px; color: #183e34; text-decoration: none; font-weight: 600; }
+.journal-nav a[aria-current] { background: #183e34; color: #fffdf5; }
+.period { display: flex; align-items: center; gap: 10px; margin: 18px 0; }
+.period select { padding: 10px; font: inherit; color: inherit; background: #fffdf5; border: 1px solid #acb8a8; border-radius: 10px; }
+.trend-section { margin: 28px 0; }
+.trend-section h2 { margin-bottom: 6px; }
+.trend-section p { margin: 6px 0 14px; color: #495c50; font-size: 14px; }
+.trend-section table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.trend-section th, .trend-section td { padding: 9px 4px; border-bottom: 1px solid #d3d9ca; text-align: right; }
+.trend-section th:first-child { text-align: left; }
+.trend-section tbody th { font-weight: 500; }
+.peak-times { padding-left: 20px; margin: 12px 0; }
+.peak-times:empty { display: none; }

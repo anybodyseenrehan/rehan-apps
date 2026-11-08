@@ -1,8 +1,29 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#183e34"><link rel="apple-touch-icon" href="/hub-icon.png"><link rel="manifest" href="/hub.webmanifest"><title>Zuri · Training journal</title><link rel="stylesheet" href="/zuri.css"></head><body><main>
 <header><img src="/zuri-icon.png" width="43" height="43" alt=""><b>Zuri’s journal</b><a style="margin-left:auto;color:inherit" href="/">All apps</a></header>
+<nav class="journal-nav" aria-label="Journal views">
+  <a href="#log" id="log-link" aria-current="page">Potty log</a>
+  <a href="#trends" id="trends-link">Trends</a>
+</nav>
+<div id="log-view">
 <section class="hero"><div id="date"></div><h1>Potty log</h1><p id="summary"></p></section>
 <section class="entry"><h2>Log a break</h2><fieldset><legend>Where?</legend><label><input type="radio" name="place" value="Outside" checked><span>Outside</span></label><label><input type="radio" name="place" value="Indoor accident"><span>Indoor accident</span></label></fieldset>
 <div class="actions"><button data-kind="Pee"><i>💧</i>Pee</button><button data-kind="Poop"><i>💩</i>Poop</button><button data-kind="Both"><i>💧💩</i>Both</button></div>
 <details><summary>Log an earlier time</summary><input type="datetime-local" id="when" aria-label="Time of potty break"></details><div id="status" role="status"></div></section>
 <section><h2>History</h2><div id="history"></div></section>
-</main><script src="/zuri.js"></script></body></html>
+</div>
+<section id="trends-view" hidden>
+  <div class="hero"><h1>Trends</h1><p id="trend-summary"></p></div>
+  <label class="period">Show <select id="trend-period">
+    <option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="all">All time</option>
+  </select></label>
+  <div id="trend-results">
+    <section class="trend-section"><h2>Time of day</h2><p>Breaks grouped into two-hour windows in your local time. “Both” counts once in each column.</p>
+      <ul class="peak-times" id="peak-times" aria-label="Most frequent windows"></ul>
+      <table><thead><tr><th>Time window</th><th>Pee</th><th>Poop</th></tr></thead><tbody id="time-counts"></tbody></table>
+    </section>
+    <section class="trend-section"><h2>Context from notes</h2><p id="note-summary"></p>
+      <table id="note-table"><thead><tr><th>Note mentions</th><th>Pee</th><th>Poop</th></tr></thead><tbody id="note-counts"></tbody></table>
+    </section>
+  </div>
+</section>
+</main><script src="/zuri-trends.js"></script><script src="/zuri.js"></script></body></html>

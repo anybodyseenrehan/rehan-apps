@@ -5,6 +5,7 @@ const time = date => date.toLocaleTimeString(undefined,{hour:'numeric',minute:'2
 function records(){return JSON.parse(localStorage.getItem(key) || '[]')}
 function render(){
   const now=new Date(), all=records().sort((a,b)=>b.at-a.at);
+  if (!get('trends-view').hidden) renderTrends(all, now);
   get('date').textContent=day(now);
   const today=all.filter(r=>day(new Date(r.at))===day(now));
   const outside=today.filter(r=>r.place==='Outside').length;
@@ -61,4 +62,14 @@ document.querySelectorAll('[data-kind]').forEach(button=>button.onclick=()=>{
     document.querySelector('details').open=false;get('when').value='';document.querySelector('[value=Outside]').checked=true
   }
 });
-render();window.addEventListener('pageshow',render);window.addEventListener('storage',render);
+function selectView() {
+  const trends = location.hash === '#trends';
+  get('log-view').hidden = trends;
+  get('trends-view').hidden = !trends;
+  get(trends ? 'log-link' : 'trends-link').removeAttribute('aria-current');
+  get(trends ? 'trends-link' : 'log-link').setAttribute('aria-current', 'page');
+  render();
+}
+get('trend-period').onchange = render;
+window.addEventListener('hashchange', selectView);
+selectView();window.addEventListener('pageshow',render);window.addEventListener('storage',render);
