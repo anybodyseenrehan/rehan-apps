@@ -20,7 +20,32 @@ function render(){
     kind.textContent=item.kind==='Both'?'Pee + poop':item.kind;place.textContent=item.place;stamp.textContent=time(date);
     remove.textContent='×';remove.setAttribute('aria-label','Delete '+kind.textContent+' at '+stamp.textContent);
     remove.onclick=()=>{if(confirm('Delete this potty break?')) save(records().filter(r=>r.id!==item.id),'Entry deleted.')};
-    label.append(kind,place);row.append(label,stamp,remove);list.append(row);
+    const editNote = document.createElement('button');
+    const action = item.note ? 'Edit note' : 'Add note';
+    editNote.textContent = '✎';
+    editNote.title = action;
+    editNote.setAttribute('aria-label', action + ' for ' + kind.textContent + ' at ' + stamp.textContent);
+    editNote.onclick = () => {
+      const draft = window.prompt(action + ' for ' + kind.textContent + ' at ' + stamp.textContent, item.note || '');
+      if (draft === null) return;
+      const entries = records();
+      const entry = entries.find(record => record.id === item.id);
+      if (!entry) { render(); return; }
+      entry.note = draft.trim();
+      save(entries, entry.note ? 'Note saved.' : 'Note cleared.');
+    };
+    label.append(kind,place);
+    row.append(label,stamp,editNote,remove);
+    const entryBlock = document.createElement('div');
+    entryBlock.className = 'history-entry';
+    entryBlock.append(row);
+    if (item.note) {
+      const note = document.createElement('p');
+      note.className = 'entry-note';
+      note.textContent = item.note;
+      entryBlock.append(note);
+    }
+    list.append(entryBlock);
   }
 }
 function save(items,message){
