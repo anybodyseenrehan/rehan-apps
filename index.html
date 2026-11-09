@@ -1,4 +1,103 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#132b25"><meta name="description" content="Rehan's personal apps: drone maps, workout tracking, mobility, and puppy training."><link rel="apple-touch-icon" href="/hub-icon.png"><link rel="manifest" href="/hub.webmanifest"><meta name="apple-mobile-web-app-title" content="Rehan’s Apps"><title>Rehan's Apps</title><style>
-*{box-sizing:border-box}body{margin:0;background:#f3f4ed;color:#17342c;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:900px;margin:auto;padding:48px 24px 64px}.wordmark{font-size:17px;font-weight:750;letter-spacing:-.4px}header{padding:64px 0 38px}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:11px;color:#6b7c6e}h1{font-size:clamp(40px,7vw,64px);line-height:1.05;letter-spacing:-2.5px;margin:18px 0}p{color:#6b7c6e;line-height:1.6}.apps{display:grid;grid-template-columns:1fr 1fr;gap:18px}.app{display:flex;flex-direction:column;min-height:270px;padding:28px;border:1px solid #dce3d5;border-radius:24px;background:white;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}.app:hover{transform:translateY(-3px);box-shadow:0 10px 24px #17342c0a}.app:focus-visible{outline:3px solid #718a3b;outline-offset:5px}.icon{display:grid;place-items:center;width:66px;height:66px;border-radius:19px;background:#eaf0dc;margin-bottom:30px}.icon svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.workout{background:#17342c;color:#f2f5e8;border-color:#17342c}.workout .icon{background:#d8f277;color:#17342c}.title{display:flex;align-items:center;justify-content:space-between;gap:12px}h2{font-size:23px;letter-spacing:-.7px;margin:0}.app p{font-size:14px;margin:12px 0 0}.workout p{color:#c1cdbd}.arrow{font-size:25px}footer{margin-top:30px;font-size:12px;color:#7a8679}@media(max-width:600px){main{padding:30px 20px}header{padding:44px 0 26px}.apps{grid-template-columns:1fr}.app{min-height:220px;padding:24px}.icon{margin-bottom:23px}h1{letter-spacing:-1.7px}}
-</style></head><body><main><div class="wordmark">anybodyseenrehan<span style="color:#8ba25c">.</span></div><header><span class="eyebrow">A SMALL SPACE FOR EVERYDAY THINGS</span><h1>Pick your next move.</h1><p>Your tools, together in one place.</p></header><section class="apps" aria-label="Apps"><a class="app" href="/drone/"><div class="icon" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="m20 15 6 5-6 5-6-5zM14 16l-5-5m17 5 5-5M14 24l-5 5m17-5 5 5"/><ellipse cx="8" cy="9" rx="6" ry="4"/><ellipse cx="32" cy="9" rx="6" ry="4"/><ellipse cx="8" cy="31" rx="6" ry="4"/><ellipse cx="32" cy="31" rx="6" ry="4"/></svg></div><div class="title"><h2>Drone Tracker App</h2><span class="arrow" aria-hidden="true">↗</span></div><p>Open your interactive drone map.</p></a><a class="app workout" href="/workout/"><div class="icon" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M13 20h14M9 12h4v16H9zm18 0h4v16h-4zM5 16h4v8H5zm26 0h4v8h-4z"/></svg></div><div class="title"><h2>Workout Tracker</h2><span class="arrow" aria-hidden="true">↗</span></div><p>Log Push, Pull and Legs. Build on your last session.</p></a><a class="app" href="/zuri.html"><div class="icon" aria-hidden="true"><img src="/zuri-icon.png" width="48" height="48" alt="" style="border-radius:13px"></div><div class="title"><h2>Zuri’s Training Journal</h2><span class="arrow" aria-hidden="true">↗</span></div><p>Log potty breaks and spot patterns in Zuri’s day.</p></a><a class="app" href="/mobility/"><div class="icon" aria-hidden="true"><span style="font-size:34px">☀</span></div><div class="title"><h2>Mobility</h2><span class="arrow" aria-hidden="true">↗</span></div><p>Open your morning hip mobility routine.</p></a></section><footer>Made for your everyday.</footer></main></body></html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121615">
+  <meta name="description" content="Rehan’s apps for workouts, mobility, Zuri’s training journal, and drone tracking.">
+  <meta name="apple-mobile-web-app-title" content="Rehan’s Apps">
+  <link rel="apple-touch-icon" href="/hub-icon.png">
+  <link rel="manifest" href="/hub.webmanifest">
+  <title>Rehan’s Apps</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      background: #121615;
+      color: #f0f2ee;
+      --surface: #1e2422;
+      --muted: #9ba59f;
+      --line: #303834;
+      --sage: #b4c79c;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main {
+      max-width: 680px;
+      margin: auto;
+      padding: calc(52px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    }
+    header { margin-bottom: 28px; }
+    h1 { margin: 0; font-size: 34px; line-height: 1.15; font-weight: 650; letter-spacing: -1px; }
+    .apps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; list-style: none; margin: 0; padding: 0; }
+    .apps li { display: flex; min-width: 0; }
+    .app {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      width: 100%;
+      min-height: 184px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      color: inherit;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color .15s, border-color .15s;
+    }
+    .icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 16px; background: #293229; color: var(--sage); }
+    .icon svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; }
+    h2 { margin: 0; font-size: 19px; line-height: 1.35; font-weight: 600; letter-spacing: -.35px; overflow-wrap: break-word; }
+    .chevron { width: 14px; height: 14px; flex: 0 0 auto; fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .app:focus-visible { outline: 2px solid var(--sage); outline-offset: 4px; }
+    .app:active { background: #293229; }
+    @media (hover: hover) { .app:hover { background: #242d28; border-color: #485345; } }
+    @media (max-width: 420px) { .apps { gap: 12px; } .app { padding: 18px; } h2 { font-size: 17px; } .title { gap: 6px; } }
+    @media (prefers-reduced-motion: reduce) { .app { transition: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1>Apps</h1></header>
+    <nav aria-label="Apps">
+      <ol class="apps">
+        <li>
+          <a class="app" href="/workout/">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40"><path d="M13 20h14M9 12h4v16H9zm18 0h4v16h-4zM5 16h4v8H5zm26 0h4v8h-4z"/></svg>
+            </span>
+            <div class="title"><h2>Workout Tracker</h2><svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></div>
+          </a>
+        </li>
+        <li>
+          <a class="app" href="/mobility/">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="7" r="3"/><path d="M20 13v10m-9-7 9-3 9 3M11 16l-3 7H4m25-7 3 7h4M20 23l-9 6c-2 1.5-1 5 2 5h14c3 0 4-3.5 2-5l-9-6m-6 6 12 5"/></svg>
+            </span>
+            <div class="title"><h2>Mobility</h2><svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></div>
+          </a>
+        </li>
+        <li>
+          <a class="app" href="/zuri.html">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40"><ellipse cx="8" cy="15" rx="3" ry="4" transform="rotate(-24 8 15)"/><ellipse cx="16" cy="9" rx="3" ry="4"/><ellipse cx="25" cy="9" rx="3" ry="4"/><ellipse cx="33" cy="15" rx="3" ry="4" transform="rotate(24 33 15)"/><path d="M20 19c-4 0-5 4-8 6-5 3-3 10 2 9 4-1 8-1 12 0 5 1 7-6 2-9-3-2-4-6-8-6Z"/></svg>
+            </span>
+            <div class="title"><h2>Zuri’s Training Journal</h2><svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></div>
+          </a>
+        </li>
+        <li>
+          <a class="app" href="/drone/">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 40 40"><path d="m20 15 6 5-6 5-6-5zM14 16l-5-5m17 5 5-5M14 24l-5 5m17-5 5 5"/><ellipse cx="8" cy="9" rx="6" ry="4"/><ellipse cx="32" cy="9" rx="6" ry="4"/><ellipse cx="8" cy="31" rx="6" ry="4"/><ellipse cx="32" cy="31" rx="6" ry="4"/></svg>
+            </span>
+            <div class="title"><h2>Drone Tracker App</h2><svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></div>
+          </a>
+        </li>
+      </ol>
+    </nav>
+  </main>
+</body>
+</html>
