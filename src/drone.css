@@ -1,0 +1,16 @@
+html, body { width: 100%; height: 100%; overflow: hidden; }
+.map-shell { display: flex; flex-direction: column; height: 100%; height: 100dvh; }
+.map-shell .app-header { flex-shrink: 0; margin: 0; padding: calc(16px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 16px max(20px, env(safe-area-inset-left)); border-bottom: 1px solid var(--line); }
+.map-shell .app-title { font-size: 24px; }
+#map { width: 100%; flex: 1; min-height: 0; background: var(--surface); }
+.leaflet-container { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+.leaflet-bar { border: 1px solid var(--line) !important; border-radius: 12px; box-shadow: 0 4px 16px #0003; overflow: hidden; }
+.leaflet-bar a, .leaflet-bar a:hover { width: 44px; height: 44px; line-height: 44px; background: var(--surface); color: var(--sage); border-bottom-color: var(--line); }
+.leaflet-bar a:first-child, .leaflet-bar a:last-child { border-radius: 0; }
+.leaflet-bar a.leaflet-disabled { background: var(--surface); color: var(--muted); }
+.leaflet-control a:focus-visible { outline: 2px solid var(--sage); outline-offset: -3px; }
+.leaflet-container .leaflet-control-attribution { background: #1e2422ed; color: #f0f2ee; padding: 4px 8px calc(4px + env(safe-area-inset-bottom)); font-size: 10px; }
+.leaflet-control-attribution a { color: #cbd7c6; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip, .leaflet-control-layers { background: var(--surface); color: #f0f2ee; }
+.leaflet-container a.leaflet-popup-close-button { color: var(--muted); }
+@media (max-width: 370px) { .map-shell .app-title { font-size: 22px; } .map-shell .app-header { padding-left: 16px; padding-right: 16px; } }

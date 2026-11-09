@@ -1,1 +1,1 @@
-{"name":"Push Workout Log","short_name":"Workout","id":"./","start_url":"./","scope":"./","display":"standalone","background_color":"#121615","theme_color":"#121615","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}
+{"name":"Workout Tracker","short_name":"Workout","id":"./","start_url":"./","scope":"./","display":"standalone","background_color":"#121615","theme_color":"#121615","icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]}

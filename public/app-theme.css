@@ -1,0 +1,49 @@
+/* Shared appearance for the app hub and every sub-app. */
+:root {
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  background: #121615;
+  color: #f0f2ee;
+  --background: #121615;
+  --surface: #1e2422;
+  --muted: #9ba59f;
+  --line: #303834;
+  --sage: #b4c79c;
+  --control: #303a34;
+  --selected: #293229;
+  --field: #151a17;
+  --danger: #ffb4ac;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: #f0f2ee; }
+[hidden] { display: none !important; }
+.app-shell { max-width: 640px; margin: auto; padding: calc(24px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); }
+.app-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0; margin: 0 0 28px; border: 0; }
+.app-title { margin: 0; font: 650 28px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: -1px; }
+.app-header .back-link { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; min-height: 44px; color: var(--muted); font-size: 14px; font-weight: 500; text-decoration: none; }
+.back-link svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.app-shell h2 { font: 600 19px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing: -.3px; }
+.app-shell p { color: var(--muted); line-height: 1.5; }
+.app-shell button, .app-shell .file { font-family: inherit; border-radius: 12px; }
+.app-shell input, .app-shell select { accent-color: var(--sage); }
+.app-shell button:focus-visible, .app-shell input:focus-visible, .app-shell select:focus-visible, .app-shell a:focus-visible, .app-shell summary:focus-visible { outline: 2px solid var(--sage); outline-offset: 4px; }
+.app-shell .card, .app-shell .hero { background: var(--surface); color: inherit; border: 1px solid var(--line); border-radius: 18px; }
+.app-shell .hero h1 { color: inherit; }
+.app-shell .chip { border-color: var(--line); }
+.app-shell .tag { text-transform: none; letter-spacing: .3px; }
+.app-shell .weekday, .app-shell .num { color: var(--muted); }
+.app-shell .note-pencil { min-height: 44px; }
+.workout-shell { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+.workout-shell nav { margin: 0; border-bottom: 0; }
+.workout-shell nav .selected { border-bottom: 0; }
+.workout-shell .field input, .workout-shell .field select { border-radius: 10px; }
+.workout-shell .backup-banner { background: var(--surface); border-color: var(--line); }
+.workout-shell .backup-banner p { color: var(--muted); }
+.workout-shell .superset { border-color: #748766; }
+.workout-shell .progress-chart line { stroke: var(--line); }
+.workout-shell .progress-chart polyline { stroke: var(--sage); }
+.workout-shell .progress-chart circle { fill: var(--sage); }
+@media (hover: hover) { .app-header .back-link:hover { color: var(--sage); } }
+@media (max-width: 370px) { .app-shell { padding-left: 16px; padding-right: 16px; } .app-title { font-size: 26px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
