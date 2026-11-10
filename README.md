@@ -1,6 +1,6 @@
 # Personal App
 
-One repository for the homepage and all four sub-apps.
+One repository for the homepage and all five sub-apps.
 
 ## Where to edit
 
@@ -9,6 +9,7 @@ One repository for the homepage and all four sub-apps.
 | `index.html` | Homepage and app launcher |
 | `apps/workout/` | Workout page, logic, icon, manifest, and offline worker |
 | `apps/mobility/` | Mobility page, completion calendar, video helpers, and styles |
+| `apps/meditation/` | Meditation timer, bells, session calendar, and time totals |
 | `apps/zuri/` | Zuri’s Training page, potty logging, trends, icon, and styles |
 | `apps/drone/` | Drone page, map logic, and styles |
 | `shared/` | Common theme, hub manifest, and shared assets |
@@ -39,6 +40,7 @@ Vercel continues using `npm run build` and the `dist` output directory. The GitH
 | Homepage | `/` |
 | Workout | `/workout/` |
 | Mobility | `/mobility/` |
+| Meditation | `/meditation/` |
 | Zuri’s Training | `/zuri.html` |
 | Drone Tracker | `/drone/` |
 

@@ -7,6 +7,7 @@ export const stagingRoot = resolve(root, '.app-source');
 export const pages = {
   'index.html': 'index.html',
   'workout/index.html': 'apps/workout/index.html',
+  'meditation/index.html': 'apps/meditation/index.html',
   'mobility/index.html': 'apps/mobility/index.html',
   'zuri.html': 'apps/zuri/index.html',
   'drone/index.html': 'apps/drone/index.html',
@@ -19,6 +20,9 @@ export const assets = {
   'zuri.css': 'apps/zuri/styles.css',
   'zuri.js': 'apps/zuri/app.js',
   'zuri-trends.js': 'apps/zuri/trends.js',
+  'meditation.css': 'apps/meditation/styles.css',
+  'meditation.js': 'apps/meditation/app.js',
+  'meditation-core.js': 'apps/meditation/core.js',
   'mobility.css': 'apps/mobility/styles.css',
   'mobility.js': 'apps/mobility/app.js',
   'mobility-videos.js': 'apps/mobility/videos.js',

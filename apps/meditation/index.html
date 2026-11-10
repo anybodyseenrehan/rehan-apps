@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121615">
+  <link rel="apple-touch-icon" href="/hub-icon.png">
+  <link rel="manifest" href="/hub.webmanifest">
+  <title>Meditation · Rehan’s Apps</title>
+  <link rel="stylesheet" href="/app-theme.css">
+  <link rel="stylesheet" href="/mobility.css">
+  <link rel="stylesheet" href="/meditation.css">
+</head>
+<body>
+<main class="app-shell">
+  <header class="app-header"><h1 class="app-title">Meditation</h1><a class="back-link" href="/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m10 3-5 5 5 5"/></svg>All apps</a></header>
+  <nav class="view-tabs" aria-label="Meditation views">
+    <button data-view="timer" aria-pressed="true" aria-controls="timerView">Timer</button>
+    <button data-view="calendar" aria-pressed="false" aria-controls="calendarView">Calendar</button>
+    <button data-view="tracker" aria-pressed="false" aria-controls="trackerView">Tracker</button>
+  </nav>
+  <p id="status" class="status" role="status"></p>
+  <section id="timerView" aria-label="Meditation timer">
+    <form id="setup" class="card">
+      <h2>Make time to pause.</h2>
+      <label>Warmup <span>minutes</span><input id="warmup" type="number" min="0" max="60" step="0.5" value="1" required></label>
+      <label>Meditation <span>minutes</span><input id="duration" type="number" min="0.5" max="240" step="0.5" value="10" required></label>
+      <label>Bell interval <span>minutes · 0 for none</span><input id="interval" type="number" min="0" max="240" step="0.5" value="2" required></label>
+      <p class="hint">Gong at the start, halfway, and end. Soft bells between.</p>
+      <div class="sound-preview"><button type="button" id="previewGong">Try gong</button><button type="button" id="previewBell">Try bell</button></div>
+      <button class="primary full" type="submit">Begin session</button>
+      <p class="hint">Keep this page open and sound on for reliable bells.</p>
+    </form>
+    <section id="running" class="card timer-card" hidden aria-label="Active session">
+      <p id="phase" role="status">Warmup</p>
+      <div class="timer-ring"><span id="remaining" role="timer" aria-label="Time remaining">10:00</span></div>
+      <p id="sessionInfo"></p>
+      <div class="actions"><button id="pause" class="primary">Pause</button><button id="finish">End session</button></div>
+    </section>
+    <section id="result" class="card timer-card" hidden aria-label="Session result"><h2 id="resultTitle">Session complete</h2><p id="resultText" role="status"></p><button id="retrySave" hidden>Retry saving</button><button id="again" class="primary">New session</button></section>
+  </section>
+  <section id="calendarView" aria-label="Meditation calendar" hidden>
+    <div class="calendar-heading"><button id="monthPrev" aria-label="Previous month">←</button><h2 id="calendarMonth" aria-live="polite"></h2><button id="monthNext" aria-label="Next month">→</button></div>
+    <div class="calendar-meta"><p>Meditation time per day</p><button id="calendarToday">Today</button></div>
+    <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Dates"></div>
+    <section class="day-detail"><h2 id="dayTitle"></h2><div id="daySessions"></div></section>
+  </section>
+  <section id="trackerView" aria-label="Meditation totals" hidden>
+    <div class="totals"><div class="card"><p>This week</p><strong id="weekTotal"></strong></div><div class="card"><p>This month</p><strong id="monthTotal"></strong></div><div class="card"><p>This year</p><strong id="yearTotal"></strong></div></div>
+    <div class="period-controls"><label for="period">Browse</label><select id="period"><option value="week">Weekly</option><option value="month">Monthly</option><option value="year">Yearly</option></select></div>
+    <div class="calendar-heading"><button id="periodPrev" aria-label="Previous period">←</button><h2 id="periodTitle" aria-live="polite"></h2><button id="periodNext" aria-label="Next period">→</button></div>
+    <div class="card period-summary"><strong id="periodTotal"></strong><p id="periodCount"></p><div id="breakdown"></div></div>
+    <p class="hint">Weeks start Monday. Warmup and paused time are excluded. History is saved on this device.</p>
+  </section>
+  <noscript><p>Enable JavaScript to use the timer and session history.</p></noscript>
+</main>
+<script src="/meditation-core.js" defer></script>
+<script src="/meditation.js" defer></script>
+</body>
+</html>

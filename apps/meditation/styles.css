@@ -1,0 +1,29 @@
+#setup, .timer-card, .period-summary { padding: 24px; }
+#setup h2 { margin: 0 0 24px; }
+#setup label { display: grid; grid-template-columns: 1fr 100px; align-items: center; margin: 18px 0; gap: 4px 12px; font-size: 16px; }
+#setup label span { grid-column: 1; color: var(--muted); font-size: 12px; }
+#setup input { grid-column: 2; grid-row: span 2; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--field); color: inherit; font: inherit; }
+.app-shell .primary { background: var(--sage); color: #182016; border-color: var(--sage); font-weight: 600; }
+.full { width: 100%; margin-top: 16px; }
+.app-shell .hint { font-size: 12px; margin-bottom: 0; }
+.sound-preview, .actions { display: flex; gap: 10px; justify-content: center; margin-top: 22px; }
+.sound-preview button { flex: 1; }
+.timer-card { text-align: center; }
+#phase { color: var(--sage); font-size: 18px; }
+.timer-ring { display: grid; place-items: center; width: min(260px, 100%); aspect-ratio: 1; margin: 30px auto; border: 2px solid var(--sage); border-radius: 50%; box-shadow: 0 0 60px #b4c79c09; }
+#remaining { font-size: clamp(42px, 12vw, 60px); font-weight: 300; letter-spacing: -2px; font-variant-numeric: tabular-nums; }
+.totals { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; margin-bottom: 28px; }
+.totals .card { padding: 16px 10px; }
+.totals p { font-size: 12px; margin: 0 0 10px; }
+.totals strong { font-weight: 550; font-size: 18px; }
+.period-controls { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; color: var(--muted); }
+select { padding: 10px; background: var(--surface); color: #f0f2ee; border: 1px solid var(--line); font: inherit; border-radius: 10px; }
+.period-summary { margin-top: 20px; }
+#periodTotal { font-size: 32px; font-weight: 500; color: var(--sage); }
+.session-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.session-row:last-child { border-bottom: 0; }
+.session-row time, .session-row small { color: var(--muted); }
+.bar-row { display: grid; grid-template-columns: 64px 1fr 65px; align-items: center; gap: 10px; font-size: 12px; margin: 14px 0; }
+.bar-row span:last-child { text-align: right; color: var(--muted); }
+.bar-track { height: 6px; background: var(--line); border-radius: 8px; overflow: hidden; }
+.bar-fill { display: block; height: 100%; background: var(--sage); border-radius: inherit; }
