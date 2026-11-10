@@ -43,7 +43,6 @@
       const checkbox = $(`[data-complete="${routine.id}"]`);
       checkbox.checked = done;
       checkbox.disabled = readError;
-      $(`[data-completion-detail="${routine.id}"]`).textContent = done ? 'Saved to your calendar. Uncheck to undo.' : 'Resets daily. Your history stays saved.';
     }
   }
 
@@ -65,7 +64,11 @@
     $('#dayTitle').textContent = dateLabel(dayDate(selectedDay));
     const records = completed(selectedDay);
     $('#dayRoutines').innerHTML = records.length
-      ? `<ul class="completed-routines">${records.map(record => `<li><span class="completion-mark" aria-hidden="true">✓</span>${esc(record.title)}</li>`).join('')}</ul>`
+      ? `<ul class="completed-routines">${records.map(record => {
+        const timestamp = record.completedAt && new Date(record.completedAt);
+        const time = timestamp && Number.isFinite(timestamp.getTime()) ? `<time datetime="${esc(record.completedAt)}">${esc(timestamp.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }))}</time>` : '';
+        return `<li><span class="completion-mark" aria-hidden="true">✓</span><span>${esc(record.title)}</span>${time}</li>`;
+      }).join('')}</ul>`
       : '<p>No completed routines.</p>';
   }
 
@@ -107,7 +110,7 @@
       if (readError) return;
       const next = JSON.parse(JSON.stringify(db));
       const records = completed(today).filter(record => record.routineId !== routine.id);
-      if (checked) records.push({ routineId: routine.id, title: routine.title });
+      if (checked) records.push({ routineId: routine.id, title: routine.title, completedAt: completed(today).find(record => record.routineId === routine.id)?.completedAt || new Date().toISOString() });
       if (records.length) next.completions[today] = records;
       else delete next.completions[today];
       try {

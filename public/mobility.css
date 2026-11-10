@@ -37,3 +37,4 @@
 .completed-routines { margin: 0; padding: 0; list-style: none; }
 .completed-routines li { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 15px; }
 .completion-mark { color: var(--sage); }
+.completed-routines time { margin-left: auto; flex-shrink: 0; color: var(--muted); font-size: 13px; }
