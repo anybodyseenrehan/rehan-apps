@@ -1,3 +1,15 @@
 import { defineConfig } from 'vite';
-import { fileURLToPath } from 'node:url';
-export default defineConfig({build:{rollupOptions:{input:{workout:fileURLToPath(new URL('./workout/index.html',import.meta.url)),home:fileURLToPath(new URL('./index.html',import.meta.url)),drone:fileURLToPath(new URL('./drone/index.html',import.meta.url))}}}});
+import { resolve } from 'node:path';
+import { root, stagingRoot, pages } from './scripts/paths.mjs';
+export default defineConfig({
+  root: stagingRoot,
+  publicDir: resolve(stagingRoot, 'public'),
+  build: {
+    outDir: resolve(root, 'dist'),
+    emptyOutDir: true,
+    rollupOptions: {
+      input: Object.fromEntries(Object.keys(pages).map(path =>
+        [path === 'index.html' ? 'home' : path.split('/')[0].replace('.html', ''), resolve(stagingRoot, path)])),
+    },
+  },
+});

@@ -1,12 +1,13 @@
 {
-  "name": "drone-safety-app",
+  "name": "personal-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "node scripts/project.mjs dev",
+    "build": "node scripts/project.mjs build",
+    "preview": "node scripts/project.mjs preview",
+    "test": "node --test tests/*.test.cjs"
   },
   "devDependencies": {
     "vite": "^7.3.1"

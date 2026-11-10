@@ -2,7 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const source = fs.readFileSync('public/mobility.js', 'utf8');
+const source = fs.readFileSync('apps/mobility/app.js', 'utf8');
 const KEY = 'mobility.completions.v1';
 
 function app({ saved = null, now = '2026-11-09T12:00:00', failWrite = false } = {}) {

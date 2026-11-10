@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const source=fs.readFileSync('public/workout/app.js','utf8');
+const source=fs.readFileSync('apps/workout/app.js','utf8');
 function app(saved=null){const nodes=new Map(),listeners=new Map();let raw=saved,answer=null;const node=()=>({textContent:'',innerHTML:'',value:'',hidden:true,checked:false,classList:{toggle(){}},dataset:{}});const c={console,Date,structuredClone,crypto:require('node:crypto').webcrypto,localStorage:{getItem:()=>raw,setItem:(k,v)=>raw=v},document:{querySelector:s=>{if(!nodes.has(s))nodes.set(s,node());return nodes.get(s);},querySelectorAll:s=>listeners.get(s)||[]},navigator:{},clearInterval(){},setInterval(){},setTimeout(){},window:{scrollTo(){}},prompt:()=>answer,confirm:()=>true,alert(){}};vm.createContext(c);vm.runInContext(source,c);return {run:s=>vm.runInContext(s,c),nodes,listeners,answer:v=>answer=v,raw:()=>raw};}
 function log(a,r,date,weight=100){a.run(`result=null;start('${r}');db.active.startedAt='${date}';db.active.exercises.bench=[{weight:${weight},reps:10}];db.active.completedAt='${date}';db.workouts.push(db.active);db.active=null;`);}
 test('original logs migrate without loss and original backups validate',()=>{const old={schemaVersion:1,workouts:[{id:'old',routine:'push',startedAt:'2026-01-01',completedAt:'2026-01-02',treadmill:{done:true},exercises:{bench:[{weight:50,reps:8}],triceps:[],delts:[],plank:[]}}],active:null};const a=app(JSON.stringify(old));assert.equal(a.run('readError'),false);assert.equal(a.run('db.schemaVersion'),3);assert.equal(a.run('db.workouts[0].exercises.bench[0].weight'),50);assert.equal(a.run('next()'),'legs1');a.run('validate(db)');});

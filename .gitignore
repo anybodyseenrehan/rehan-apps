@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Generated website source, recreated from apps/ and shared/
+.app-source/

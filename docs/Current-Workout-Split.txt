@@ -1,0 +1,57 @@
+Current workout split
+Confirmed: October 24, 2026
+Cycle: Push 1 → Legs 1 → Pull 1 → Rest → Push 2 → Legs 2 → Pull 2 → Rest
+
+Push 1
+Treadmill:
+Rear Delt Pulls:
+Flat Bench:
+Tricep Extensions:
+Chest Flies:
+Side Delt Raises:
+Plank:
+Took:
+--------------------------------------------------
+Push 2
+Treadmill:
+Flat Bench:
+Tricep Extensions:
+Flexor Curls + Reverse Wrist Curls (Superset):
+Side Delt Raises:
+Overhead Barbell Tricep Extensions:
+Took:
+--------------------------------------------------
+Pull 1
+Treadmill:
+Lat Pulldown:
+Bicep Curl:
+Rows:
+Back Extensions:
+Abs:
+Took:
+--------------------------------------------------
+Pull 2
+Treadmill:
+Lat Pulldown:
+Bicep Curl:
+Flexor Curls + Reverse Wrist Curls (Superset):
+Hammer Curls:
+Back Extensions:
+Took:
+--------------------------------------------------
+Legs 1
+Treadmill:
+Leg Press + Calf Raises (Superset):
+Leg Extensions:
+Leg Curls:
+Glute Leans:
+Hip Abductions + Hip Adductions (Superset):
+Took:
+--------------------------------------------------
+Legs 2
+Treadmill:
+Leg Press + Calf Raises (Superset):
+Romanian Deadlifts:
+Hip Thrusts:
+Leg Extensions:
+Took:
