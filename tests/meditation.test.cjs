@@ -34,11 +34,11 @@ test('totals include partial sessions, multiple sessions per day, and only selec
   assert.equal(total(sessions,start,end),745);
 });
 
-function app({saved=null,failWrite=false,settings=null,audioSession={},clockStep=0,confirmDelete=true}={}) {
+function app({saved=null,failWrite=false,settings=null,audioSession={},clockStep=0,confirmDelete=true,wakeLock}={}) {
   const nodes = new Map(), events = {}, timers = [];
   const storage = new Map(saved===null?[]:[['meditation.sessions.v1',saved]]);
   if (settings) storage.set('meditation.settings.v1',JSON.stringify(settings));
-  const played = [], audioEvents = [];
+  const played = [], audioEvents = [], scheduled = [];
   let audioInstance;
   let now = new Date(2026,10,10,12).getTime();
   const get = selector => {
@@ -53,20 +53,20 @@ function app({saved=null,failWrite=false,settings=null,audioSession={},clockStep
   class Audio {
     constructor(){this.currentTime=0;this.state='suspended';this.destination={};this.sampleRate=44100;audioInstance=this;audioEvents.push('create');}
     async resume(){audioEvents.push('resume');this.state='running';}
-    createBuffer(){return {};}
-    createBufferSource(){return {connect(){},disconnect(){},start(){audioEvents.push('prime');}};}
-    createOscillator(){return {frequency:{setValueAtTime(){}},connect(){},disconnect(){},start(at){played.push(at);},stop(){}};}
+    createBuffer(){return {getChannelData:()=>new Float32Array(32)};}
+    createBufferSource(){return {connect(){},disconnect(){},start(){audioEvents.push('prime');},stop(){audioEvents.push('stop');}};}
+    createOscillator(){let frequency;return {frequency:{setValueAtTime(value){frequency=value;}},connect(){},disconnect(){},start(at){played.push(at);scheduled.push({frequency,at});},stop(){}};}
     createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){}};}
   }
   const sandbox = {
-    Date:Clock, Meditation:context.module.exports, crypto:{randomUUID:()=>String(now)}, navigator:{audioSession},
+    Date:Clock, Meditation:context.module.exports, crypto:{randomUUID:()=>String(now)}, navigator:{audioSession,wakeLock},
     localStorage:{getItem:k=>storage.get(k)??null,setItem(k,v){if(failWrite)throw Error();storage.set(k,v);}},
     document:{querySelector:get,querySelectorAll:()=>[],hidden:false,addEventListener:(k,fn)=>events[k]=fn},
     window:{AudioContext:Audio,confirm:()=>confirmDelete,addEventListener:(k,fn)=>events[k]=fn},
     setInterval:fn=>{timers.push(fn);return timers.length;},clearInterval(){}
   };
   vm.runInNewContext(fs.readFileSync('apps/meditation/app.js','utf8'),sandbox);
-  return {get,events,storage,played,audioEvents,audioSession,audio:()=>audioInstance,advance:seconds=>{now+=seconds*1000;timers.at(-1)();},
+  return {get,events,storage,played,scheduled,audioEvents,audioSession,audio:()=>audioInstance,advance:seconds=>{now+=seconds*1000;timers.at(-1)();},
     start:()=>get('#setup').listeners.submit({preventDefault(){}}),click:selector=>get(selector).listeners.click(),
     records:()=>JSON.parse(storage.get('meditation.sessions.v1')||'{"sessions":[]}').sessions};
 }
@@ -176,4 +176,43 @@ test('deleting history preserves active timer and incorporates other tabs latest
   a.advance(30); a.click('#finish');
   assert.equal(a.records().length,3);
   assert.equal(a.records().at(-1).seconds,60);
+});
+
+const flush = async () => { await Promise.resolve(); await Promise.resolve(); await Promise.resolve(); };
+function wakeHarness() {
+  const locks=[];
+  return {locks,async request(){
+    const lock={released:false,listeners:{},addEventListener(name,fn){this.listeners[name]=fn;},async release(){this.released=true;this.listeners.release?.();}};
+    locks.push(lock); return lock;
+  }};
+}
+test('screen lock is held without duplicate requests, restored after release, and released on pause/end',async()=>{
+  const wake=wakeHarness(), a=app({wakeLock:wake}); await a.start(); await flush();
+  assert.equal(wake.locks.length,1);
+  a.advance(12); await flush(); assert.equal(wake.locks.length,1);
+  await wake.locks[0].release(); a.advance(1); await flush();
+  assert.equal(wake.locks.length,2);
+  assert.match(a.get('#wakeStatus').textContent,/Screen stays on/);
+  await a.click('#pause'); assert.equal(wake.locks[1].released,true);
+  await a.click('#pause'); await flush(); assert.equal(wake.locks.length,3);
+  a.click('#finish'); assert.equal(wake.locks[2].released,true);
+});
+test('a rejected wake lock is visible and can be retried',async()=>{
+  const wake=wakeHarness(); let reject=true;
+  const a=app({wakeLock:{request:()=>reject?Promise.reject(Error('Denied')):wake.request()}});
+  await a.start(); await flush();
+  assert.match(a.get('#wakeStatus').textContent,/Could not keep/);
+  assert.equal(a.get('#retryWake').hidden,false);
+  reject=false; await a.click('#retryWake');
+  assert.match(a.get('#wakeStatus').textContent,/Screen stays on/);
+});
+test('audio stays live between interval bells and releases the keepalive on pause and finish',async()=>{
+  const a=app(); a.get('#warmup').value='15'; a.get('#duration').value='2'; a.get('#interval').value='0.5'; await a.start();
+  assert.equal(a.audioEvents.filter(e=>e==='prime').length,2); // Tap primer + looping keepalive.
+  const bells=a.scheduled.filter(s=>s.frequency===330);
+  assert.deepEqual(bells.map(s=>Math.round(s.at)),[45,105]);
+  assert.deepEqual(a.scheduled.filter(s=>s.frequency===196).map(s=>Math.round(s.at)),[15,75,135]);
+  await a.click('#pause'); assert.ok(a.audioEvents.includes('stop'));
+  await a.click('#pause'); assert.equal(a.audioEvents.filter(e=>e==='prime').length,4);
+  a.advance(135); assert.equal(a.audioEvents.filter(e=>e==='stop').length,2);
 });

@@ -12,7 +12,8 @@
   const dateLabel = date => date.toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'});
   const dateFromKey = key => new Date(...key.split('-').map((v,i) => +v-(i===1?1:0)));
   let sessions = [], readError = false, session = null, pendingRecord = null;
-  let audio, voices = [], wakeLock, ticker, starting = false;
+  let audio, voices = [], wakeLock, ticker, starting = false, audioKeeper;
+  let wakeRequest = null, wakeGeneration = 0, lastWakeAttempt = 0;
   let selectedDay = dayKey(new Date()), month = new Date(new Date().getFullYear(),new Date().getMonth(),1), periodDate = new Date();
 
   function read() {
@@ -49,7 +50,7 @@
       audio.onstatechange = () => {
         if (session && !session.paused && audio.state !== 'running') {
           session.elapsed = elapsed(); session.paused = true;
-          stopSounds(); releaseWake(); $('#pause').textContent = 'Resume'; tick();
+          stopSounds(); stopAudioKeeper(); releaseWake(); $('#pause').textContent = 'Resume'; tick();
           $('#status').textContent = 'Sound was interrupted. Tap Resume to continue with bells.';
         }
       };
@@ -86,16 +87,63 @@
   function stopSounds() {
     for (const {oscillator} of voices) { try { oscillator.stop(); } catch {} }
   }
-  async function keepAwake() {
-    try {
-      if (!document.hidden && navigator.wakeLock && session && !session.paused) {
-        const lock = await navigator.wakeLock.request('screen');
-        if (!session || session.paused) await lock.release();
-        else { if (wakeLock) await wakeLock.release(); wakeLock = lock; }
-      }
-    } catch { /* Timer still works when screen wake lock is unavailable. */ }
+  function startAudioKeeper() {
+    if (audioKeeper) return;
+    // Keep a live audio source between strikes, rather than leaving only
+    // oscillators scheduled several minutes into the future.
+    const buffer = audio.createBuffer(1, audio.sampleRate, audio.sampleRate);
+    const samples = buffer.getChannelData(0);
+    for (let i=0; i<samples.length; i++) samples[i] = Math.sin(i/audio.sampleRate*2*Math.PI*20)*0.000001;
+    audioKeeper = audio.createBufferSource();
+    audioKeeper.buffer = buffer; audioKeeper.loop = true;
+    audioKeeper.connect(audio.destination); audioKeeper.start();
   }
-  function releaseWake() { if (wakeLock) { wakeLock.release().catch(()=>{}); wakeLock = null; } }
+  function stopAudioKeeper() {
+    if (!audioKeeper) return;
+    try { audioKeeper.stop(); } catch {}
+    audioKeeper.disconnect(); audioKeeper = null;
+  }
+  function wakeMessage(message, retry = false) {
+    $('#wakeStatus').textContent = message;
+    $('#retryWake').hidden = !retry;
+  }
+  function keepAwake() {
+    if (document.hidden || !session || session.paused) return Promise.resolve();
+    if (wakeLock && !wakeLock.released) return Promise.resolve();
+    if (wakeRequest) return wakeRequest;
+    lastWakeAttempt = Date.now();
+    if (!navigator.wakeLock) {
+      wakeMessage('Screen keep-awake is unavailable here. Open in Safari and keep Auto-Lock off for this session.', true);
+      return Promise.resolve();
+    }
+    const generation = wakeGeneration;
+    wakeRequest = (async () => {
+      try {
+        const lock = await navigator.wakeLock.request('screen');
+        if (generation !== wakeGeneration || !session || session.paused || document.hidden) { await lock.release(); return; }
+        wakeLock = lock;
+        wakeMessage('Screen stays on during this session.');
+        lock.addEventListener('release', () => {
+          if (wakeLock !== lock) return;
+          wakeLock = null;
+          if (session && !session.paused) {
+            wakeMessage('Screen keep-awake was interrupted. Retrying…', true);
+            lastWakeAttempt = 0;
+          }
+        });
+      } catch {
+        wakeMessage('Could not keep the screen on. Turn off Low Power Mode, then tap Retry.', true);
+      }
+    })().finally(() => { wakeRequest = null; });
+    return wakeRequest;
+  }
+  function releaseWake() {
+    wakeGeneration++;
+    const lock = wakeLock; wakeLock = null;
+    if (lock) lock.release().catch(()=>{});
+    wakeMessage('');
+  }
+  $('#retryWake').addEventListener('click', () => keepAwake());
   function elapsed() { return session.elapsed + (session.paused ? 0 : (Date.now()-session.anchor)/1000); }
   function schedule(initial = false) {
     stopSounds();
@@ -135,7 +183,7 @@
     const current = session;
     const seconds = Math.min(current.duration, Math.max(0, elapsed()-current.warmup));
     if (!complete) stopSounds(); // Let the scheduled final gong ring out on completion.
-    clearInterval(ticker); releaseWake(); session = null;
+    clearInterval(ticker); stopAudioKeeper(); releaseWake(); session = null;
     $('#running').hidden = true; $('#result').hidden = false;
     $('#resultTitle').textContent = complete ? 'Session complete' : 'Session ended';
     $('#resultText').textContent = seconds >= 1 ? `${length(seconds)} of meditation${complete ? '' : ' · partial session'}.` : 'Warmup only · no meditation time logged.';
@@ -163,10 +211,11 @@
     $('#setup').hidden = true; $('#result').hidden = true; $('#running').hidden = false;
     $('#pause').textContent = 'Pause';
     $('#sessionInfo').textContent = `${length(duration)} meditation${settings.interval ? ` · bell every ${length(settings.interval*60)}` : ' · no interval bells'}`;
-    schedule(true); keepAwake(); tick(); ticker = setInterval(update,200);
+    startAudioKeeper(); schedule(true); keepAwake(); tick(); ticker = setInterval(update,200);
     starting = false;
   });
   function update() {
+    if (session && !session.paused && Date.now()-lastWakeAttempt >= 10000) keepAwake();
     if (session && !session.meditationStarted && elapsed() >= session.warmup) {
       session.startedAt = new Date(Date.now()-(elapsed()-session.warmup)*1000).toISOString();
       session.meditationStarted = true;
@@ -178,7 +227,7 @@
     update(); if (!session) return;
     if (!session.paused) {
       session.elapsed = elapsed(); session.paused = true;
-      stopSounds(); releaseWake(); $('#pause').textContent = 'Resume';
+      stopSounds(); stopAudioKeeper(); releaseWake(); $('#pause').textContent = 'Resume';
     } else {
       starting = true;
       try { await unlockAudio(); } catch {
@@ -187,7 +236,7 @@
       }
       if (!session) { starting = false; return; }
       session.anchor = Date.now(); session.paused = false;
-      schedule(); keepAwake(); $('#pause').textContent = 'Pause'; $('#status').textContent = '';
+      startAudioKeeper(); schedule(); keepAwake(); $('#pause').textContent = 'Pause'; $('#status').textContent = '';
       starting = false;
     }
     tick();
@@ -292,12 +341,14 @@
     if (!document.hidden) {
       update(); keepAwake(); read(); renderHistory();
       if (session && !session.paused && audio.state !== 'running') {
-        session.elapsed = elapsed(); session.paused = true; stopSounds(); releaseWake();
+        session.elapsed = elapsed(); session.paused = true; stopSounds(); stopAudioKeeper(); releaseWake();
         $('#pause').textContent = 'Resume'; tick();
         $('#status').textContent = 'Sound was interrupted. Tap Resume to continue with bells.';
       }
     }
   });
+  window.addEventListener('focus', () => { update(); keepAwake(); });
+  window.addEventListener('pageshow', () => { update(); keepAwake(); });
   window.addEventListener('storage',event=> { if (event.key===KEY || event.key===null) { read(); renderHistory(); } });
   window.addEventListener('beforeunload',event=> { if (session || pendingRecord) { event.preventDefault(); event.returnValue=''; } });
   read(); renderHistory();
