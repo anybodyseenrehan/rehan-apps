@@ -23,7 +23,7 @@
   <section id="timerView" aria-label="Meditation timer">
     <form id="setup" class="card">
       <h2>Make time to pause.</h2>
-      <label>Warmup <span>minutes</span><input id="warmup" type="number" min="0" max="60" step="0.5" value="1" required></label>
+      <label>Warmup <span>seconds</span><input id="warmup" type="number" min="0" max="3600" step="1" value="60" required></label>
       <label>Meditation <span>minutes</span><input id="duration" type="number" min="0.5" max="240" step="0.5" value="10" required></label>
       <label>Bell interval <span>minutes · 0 for none</span><input id="interval" type="number" min="0" max="240" step="0.5" value="2" required></label>
       <p class="hint">Gong at the start, halfway, and end. Soft bells between.</p>

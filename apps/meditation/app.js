@@ -32,23 +32,41 @@
   try {
     const saved = JSON.parse(localStorage.getItem(SETTINGS));
     if (saved) for (const name of ['warmup','duration','interval']) {
-      const value = saved[name];
-      if (Number.isFinite(value) && value >= (name==='duration' ? 0.5 : 0) && value <= (name==='warmup' ? 60 : 240) && value*2===Math.round(value*2)) $('#'+name).value = value;
+      const value = name === 'warmup' && saved.warmupUnit !== 'seconds' ? saved[name]*60 : saved[name];
+      const validStep = name === 'warmup' ? Number.isInteger(value) : value*2===Math.round(value*2);
+      if (Number.isFinite(value) && value >= (name==='duration' ? 0.5 : 0) && value <= (name==='warmup' ? 3600 : 240) && validStep) $('#'+name).value = value;
     }
   } catch { /* Defaults remain usable if settings are unavailable. */ }
 
   async function unlockAudio() {
-    if (!audio) {
+    // iPhone otherwise treats Web Audio as a sound effect and can mute it with
+    // the Ring/Silent switch. Request media playback before opening the context.
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
+    if (!audio || audio.state === 'closed') {
       const Audio = window.AudioContext || window.webkitAudioContext;
       if (!Audio) throw Error('Audio unavailable');
       audio = new Audio();
+      audio.onstatechange = () => {
+        if (session && !session.paused && audio.state !== 'running') {
+          session.elapsed = elapsed(); session.paused = true;
+          stopSounds(); releaseWake(); $('#pause').textContent = 'Resume'; tick();
+          $('#status').textContent = 'Sound was interrupted. Tap Resume to continue with bells.';
+        }
+      };
     }
-    await audio.resume();
+    // Both actions happen directly inside the tap, before awaiting a promise.
+    const resumed = audio.resume();
+    const primer = audio.createBufferSource();
+    primer.buffer = audio.createBuffer(1, 1, audio.sampleRate);
+    primer.connect(audio.destination);
+    primer.onended = () => primer.disconnect();
+    primer.start(0);
+    await resumed;
     if (audio.state !== 'running') throw Error('Audio unavailable');
   }
   // Inharmonic partials and long decays create two distinct, gentle struck-metal sounds.
   function strike(kind, when = audio.currentTime) {
-    const gong = kind === 'gong', base = gong ? 110 : 528;
+    const gong = kind === 'gong', base = gong ? 196 : 528;
     const partials = gong ? [1,1.48,2.03,2.62,3.91,5.42] : [1,2.76,5.4];
     partials.forEach((ratio,i) => {
       const oscillator = audio.createOscillator(), gain = audio.createGain();
@@ -56,7 +74,7 @@
       oscillator.frequency.setValueAtTime(base*ratio,when);
       const decay = gong ? 8/(1+i*.23) : 4/(1+i*.3);
       gain.gain.setValueAtTime(0,when);
-      gain.gain.linearRampToValueAtTime((gong ? .15 : .11)/(1+i*1.5),when+.018);
+      gain.gain.linearRampToValueAtTime((gong ? .23 : .20)/(1+i*1.5),when+.018);
       gain.gain.exponentialRampToValueAtTime(.0001,when+decay);
       oscillator.connect(gain); gain.connect(audio.destination);
       oscillator.start(when); oscillator.stop(when+decay+.05);
@@ -79,12 +97,16 @@
   }
   function releaseWake() { if (wakeLock) { wakeLock.release().catch(()=>{}); wakeLock = null; } }
   function elapsed() { return session.elapsed + (session.paused ? 0 : (Date.now()-session.anchor)/1000); }
-  function schedule() {
+  function schedule(initial = false) {
     stopSounds();
     const seconds = elapsed();
     const audioNow = audio.currentTime;
     // Schedule on the audio clock so bells do not depend on UI timer callbacks.
-    for (const cue of session.cues) if (cue.at >= seconds) strike(cue.kind,audioNow+cue.at-seconds+.03);
+    for (const cue of session.cues) {
+      if (cue.at >= seconds || (initial && cue.at === 0)) {
+        strike(cue.kind,audioNow+Math.max(0,cue.at-seconds)+.03);
+      }
+    }
   }
   function tick() {
     if (!session) return;
@@ -132,8 +154,8 @@
       starting = false; return;
     }
     const settings = Object.fromEntries(['warmup','duration','interval'].map(name => [name,Number($('#'+name).value)]));
-    try { localStorage.setItem(SETTINGS,JSON.stringify(settings)); } catch {}
-    const warmup = settings.warmup*60, duration = settings.duration*60;
+    try { localStorage.setItem(SETTINGS,JSON.stringify({...settings,warmupUnit:'seconds'})); } catch {}
+    const warmup = settings.warmup, duration = settings.duration*60;
     session = {id:crypto.randomUUID(), startedAt:new Date(Date.now()+warmup*1000).toISOString(), warmup, duration, elapsed:0, anchor:Date.now(), paused:false, cues:cues(warmup,duration,settings.interval*60)};
     // startedAt is updated when a paused warmup actually finishes.
     session.meditationStarted = false;
@@ -141,7 +163,7 @@
     $('#setup').hidden = true; $('#result').hidden = true; $('#running').hidden = false;
     $('#pause').textContent = 'Pause';
     $('#sessionInfo').textContent = `${length(duration)} meditation${settings.interval ? ` · bell every ${length(settings.interval*60)}` : ' · no interval bells'}`;
-    schedule(); keepAwake(); tick(); ticker = setInterval(update,200);
+    schedule(true); keepAwake(); tick(); ticker = setInterval(update,200);
     starting = false;
   });
   function update() {
@@ -175,7 +197,7 @@
   $('#retrySave').addEventListener('click',savePending);
   for (const kind of ['Gong','Bell']) $('#preview'+kind).addEventListener('click',async () => {
     if (session || starting) return;
-    try { await unlockAudio(); stopSounds(); strike(kind.toLowerCase()); } catch { $('#status').textContent = 'Sound is unavailable. Check your sound settings.'; }
+    try { await unlockAudio(); stopSounds(); strike(kind.toLowerCase(),audio.currentTime+.03); $('#status').textContent = ''; } catch { $('#status').textContent = 'Sound is unavailable. Check your sound settings.'; }
   });
 
   function renderCalendar() {

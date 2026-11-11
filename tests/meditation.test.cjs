@@ -34,34 +34,39 @@ test('totals include partial sessions, multiple sessions per day, and only selec
   assert.equal(total(sessions,start,end),745);
 });
 
-function app({saved=null,failWrite=false}={}) {
+function app({saved=null,failWrite=false,settings=null,audioSession={},clockStep=0}={}) {
   const nodes = new Map(), events = {}, timers = [];
   const storage = new Map(saved===null?[]:[['meditation.sessions.v1',saved]]);
+  if (settings) storage.set('meditation.settings.v1',JSON.stringify(settings));
+  const played = [], audioEvents = [];
+  let audioInstance;
   let now = new Date(2026,10,10,12).getTime();
   const get = selector => {
     if (!nodes.has(selector)) nodes.set(selector,{
-      value:selector==='#period'?'week':selector==='#warmup'?'1':selector==='#duration'?'10':selector==='#interval'?'2':'',
+      value:selector==='#period'?'week':selector==='#warmup'?'60':selector==='#duration'?'10':selector==='#interval'?'2':'',
       textContent:'',innerHTML:'',hidden:false,listeners:{},attrs:{},
       addEventListener(k,fn){this.listeners[k]=fn;},setAttribute(k,v){this.attrs[k]=v;},reportValidity:()=>true,focus(){}
     });
     return nodes.get(selector);
   };
-  class Clock extends Date { constructor(...args){super(...(args.length?args:[now]));} static now(){return now;} }
+  class Clock extends Date { constructor(...args){super(...(args.length?args:[now]));} static now(){const value=now; now+=clockStep; return value;} }
   class Audio {
-    constructor(){this.currentTime=0;this.state='running';this.destination={};}
-    async resume(){this.state='running';}
-    createOscillator(){return {frequency:{setValueAtTime(){}},connect(){},disconnect(){},start(){},stop(){}};}
+    constructor(){this.currentTime=0;this.state='suspended';this.destination={};this.sampleRate=44100;audioInstance=this;audioEvents.push('create');}
+    async resume(){audioEvents.push('resume');this.state='running';}
+    createBuffer(){return {};}
+    createBufferSource(){return {connect(){},disconnect(){},start(){audioEvents.push('prime');}};}
+    createOscillator(){return {frequency:{setValueAtTime(){}},connect(){},disconnect(){},start(at){played.push(at);},stop(){}};}
     createGain(){return {gain:{setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){},disconnect(){}};}
   }
   const sandbox = {
-    Date:Clock, Meditation:context.module.exports, crypto:{randomUUID:()=>String(now)}, navigator:{},
+    Date:Clock, Meditation:context.module.exports, crypto:{randomUUID:()=>String(now)}, navigator:{audioSession},
     localStorage:{getItem:k=>storage.get(k)??null,setItem(k,v){if(failWrite)throw Error();storage.set(k,v);}},
     document:{querySelector:get,querySelectorAll:()=>[],hidden:false,addEventListener:(k,fn)=>events[k]=fn},
     window:{AudioContext:Audio,addEventListener:(k,fn)=>events[k]=fn},
     setInterval:fn=>{timers.push(fn);return timers.length;},clearInterval(){}
   };
   vm.runInNewContext(fs.readFileSync('apps/meditation/app.js','utf8'),sandbox);
-  return {get,events,storage,advance:seconds=>{now+=seconds*1000;timers.at(-1)();},
+  return {get,events,storage,played,audioEvents,audioSession,audio:()=>audioInstance,advance:seconds=>{now+=seconds*1000;timers.at(-1)();},
     start:()=>get('#setup').listeners.submit({preventDefault(){}}),click:selector=>get(selector).listeners.click(),
     records:()=>JSON.parse(storage.get('meditation.sessions.v1')||'{"sessions":[]}').sessions};
 }
@@ -93,4 +98,37 @@ test('ending warmup does not log meditation; corrupt and failed storage never ov
   assert.equal(c.records().length,0); assert.equal(c.get('#again').disabled,true);
   assert.equal(c.get('#retrySave').hidden,false);
   assert.match(c.get('#status').textContent,/retry saving/);
+});
+
+test('warmup seconds count down directly and legacy minute settings retain their duration',async()=>{
+  const a=app(); a.get('#warmup').value='15'; await a.start();
+  a.advance(10); assert.equal(a.get('#remaining').textContent,'0:05');
+  a.advance(5); assert.equal(a.get('#phase').textContent,'Meditation');
+  assert.equal(JSON.parse(a.storage.get('meditation.settings.v1')).warmupUnit,'seconds');
+  const b=app({settings:{warmup:0.5,duration:10,interval:2}});
+  assert.equal(b.get('#warmup').value,30);
+  const c=app({settings:{warmup:15,warmupUnit:'seconds',duration:10,interval:2}});
+  assert.equal(c.get('#warmup').value,15);
+});
+test('audio uses playback mode, primes during the tap, and previews schedule audible voices',async()=>{
+  const a=app();
+  await a.click('#previewBell');
+  assert.equal(a.audioSession.type,'playback');
+  assert.deepEqual(a.audioEvents,['create','resume','prime']);
+  assert.equal(a.played.length,3);
+  assert.ok(a.played.every(at=>at>=0.03));
+  await a.click('#previewGong'); assert.equal(a.played.length,9);
+});
+test('zero warmup still rings the opening gong when setup takes a few milliseconds',async()=>{
+  const a=app({clockStep:5}); a.get('#warmup').value='0'; await a.start();
+  assert.ok(a.played.some(at=>at===0.03));
+  assert.equal(a.played.length,30); // Three six-part gongs and four three-part bells.
+});
+test('audio interruptions immediately pause the timer until an explicit resume',async()=>{
+  const a=app(); await a.start(); a.advance(90);
+  a.audio().state='interrupted'; a.audio().onstatechange();
+  assert.equal(a.get('#pause').textContent,'Resume');
+  a.advance(120); assert.equal(a.get('#remaining').textContent,'9:30');
+  await a.click('#pause'); a.advance(30); a.click('#finish');
+  assert.equal(a.records()[0].seconds,60);
 });
