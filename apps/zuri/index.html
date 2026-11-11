@@ -1,9 +1,34 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#121615"><link rel="apple-touch-icon" href="/hub-icon.png"><link rel="manifest" href="/hub.webmanifest"><title>Zuri’s Training</title><link rel="stylesheet" href="/app-theme.css"><link rel="stylesheet" href="/zuri.css"></head><body><main class="app-shell">
 <header class="app-header"><h1 class="app-title">Zuri’s Training</h1><a class="back-link" href="/"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m10 3-5 5 5 5"/></svg>All apps</a></header>
 <nav class="journal-nav" aria-label="Journal views">
+  <a href="#training" id="training-link">Training</a>
   <a href="#log" id="log-link" aria-current="page">Potty log</a>
   <a href="#trends" id="trends-link">Trends</a>
 </nav>
+<section id="training-view" hidden>
+  <div class="training-heading"><div><p class="eyebrow">A little practice, every day</p><h2>Learning together</h2></div>
+    <p id="training-progress"></p><progress id="learned-progress" aria-label="Skills learned"></progress>
+  </div>
+  <details class="training-guide"><summary>Our family cues &amp; practice guide</summary>
+    <p><strong>Good girl</strong> marks the right action, followed by a tiny treat. <strong>Free</strong> means she may move.</p>
+    <p>Practise a few skills daily for 1–3 minutes, with 3–5 easy repetitions. Increase time, distance or distractions separately.</p>
+    <p>Aim for 4 out of 5 comfortable successes before progressing. Alone-time attempts should all remain comfortable.</p>
+    <p>From Zuri’s training plan. Public walks begin only on your vet’s clearance date after the 2 December visit.</p>
+  </details>
+  <div class="skill-toolbar"><label for="skill-filter" class="sr-only">Filter skills</label><select id="skill-filter"><option value="all">All skills</option><option value="practising">Practising</option><option value="learned">Learned</option></select><button id="add-skill" type="button">Add skill +</button></div>
+  <p id="training-status" role="status" aria-live="polite"></p>
+  <div id="skills-list"></div>
+  <dialog id="skill-dialog" aria-labelledby="skill-dialog-title">
+    <form id="skill-form">
+      <h2 id="skill-dialog-title">Add a skill</h2>
+      <label>Skill name<input name="title" required maxlength="100" autocomplete="off"></label>
+      <label>Cue <span class="optional">(optional)</span><input name="cue" maxlength="100" autocomplete="off"></label>
+      <label>How to practise<textarea name="steps" rows="5" placeholder="One step per line"></textarea></label>
+      <p id="skill-form-error" role="alert"></p>
+      <div class="form-actions"><button type="button" id="cancel-skill">Cancel</button><button class="primary" type="submit">Save skill</button></div>
+    </form>
+  </dialog>
+</section>
 <div id="log-view">
 <section class="hero"><div id="date"></div><h1>Potty log</h1><p id="summary"></p></section>
 <section class="entry"><h2>Log a break</h2><fieldset><legend>Where?</legend><label><input type="radio" name="place" value="Outside" checked><span>Outside</span></label><label><input type="radio" name="place" value="Indoor accident"><span>Indoor accident</span></label></fieldset>
@@ -26,4 +51,4 @@
     </section>
   </div>
 </section>
-</main><script src="/zuri-trends.js"></script><script src="/zuri.js"></script></body></html>
+</main><script src="/zuri-trends.js"></script><script src="/zuri-training.js"></script><script src="/zuri.js"></script></body></html>

@@ -4,6 +4,7 @@ const day = date => date.toLocaleDateString(undefined,{weekday:'long',month:'sho
 const time = date => date.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
 function records(){return JSON.parse(localStorage.getItem(key) || '[]')}
 function render(){
+  if (!get('training-view').hidden) renderTraining();
   const now=new Date(), all=records().sort((a,b)=>b.at-a.at);
   if (!get('trends-view').hidden) renderTrends(all, now);
   get('date').textContent=day(now);
@@ -54,22 +55,25 @@ function save(items,message){
   catch{get('status').textContent='Couldn’t save on this device. Please try again.';return false}
 }
 document.querySelectorAll('[data-kind]').forEach(button=>button.onclick=()=>{
-  const earlier=document.querySelector('details').open;
+  const earlier=document.querySelector('#log-view details').open;
   const at=earlier?new Date(get('when').value).getTime():Date.now();
   if(!Number.isFinite(at)||at>Date.now()){get('status').textContent='Choose a time in the past.';return}
   const place=document.querySelector('[name=place]:checked').value,kind=button.dataset.kind;
   if(save([...records(),{id:crypto.randomUUID(),at,place,kind}],kind+' logged at '+time(new Date(at))+'.')){
-    document.querySelector('details').open=false;get('when').value='';document.querySelector('[value=Outside]').checked=true
+    document.querySelector('#log-view details').open=false;get('when').value='';document.querySelector('[value=Outside]').checked=true
   }
 });
 function selectView() {
-  const trends = location.hash === '#trends';
-  get('log-view').hidden = trends;
-  get('trends-view').hidden = !trends;
-  get(trends ? 'log-link' : 'trends-link').removeAttribute('aria-current');
-  get(trends ? 'trends-link' : 'log-link').setAttribute('aria-current', 'page');
+  const view = ['log', 'trends'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'training';
+  for (const name of ['training', 'log', 'trends']) {
+    get(name + '-view').hidden = name !== view;
+    get(name + '-link').removeAttribute('aria-current');
+  }
+  get(view + '-link').setAttribute('aria-current', 'page');
   render();
 }
 get('trend-period').onchange = render;
 window.addEventListener('hashchange', selectView);
 selectView();window.addEventListener('pageshow',render);window.addEventListener('storage',render);
+
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });

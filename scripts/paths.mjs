@@ -19,6 +19,7 @@ export const assets = {
   'zuri-icon.png': 'apps/zuri/icon.png',
   'zuri.css': 'apps/zuri/styles.css',
   'zuri.js': 'apps/zuri/app.js',
+  'zuri-training.js': 'apps/zuri/training.js',
   'zuri-trends.js': 'apps/zuri/trends.js',
   'meditation.css': 'apps/meditation/styles.css',
   'meditation.js': 'apps/meditation/app.js',
