@@ -232,7 +232,35 @@
     const max = Math.max(1,...buckets.map(b=>b.seconds));
     $('#breakdown').innerHTML = buckets.map(b=>`<div class="bar-row"><span>${esc(b.label)}</span><div class="bar-track"><span class="bar-fill" style="width:${b.seconds/max*100}%"></span></div><span>${length(b.seconds)}</span></div>`).join('');
   }
-  function renderHistory() { renderCalendar(); renderTracker(); }
+  function renderSessions() {
+    const records = [...sessions].sort((a,b) => new Date(b.startedAt)-new Date(a.startedAt));
+    $('#historyList').innerHTML = records.length ? records.map(record => {
+      const date = new Date(record.startedAt);
+      const label = `${dateLabel(date)} at ${date.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})}`;
+      return `<li class="card history-session"><div><strong>${length(record.seconds)}</strong>${record.completed ? '' : ' <small>· partial</small>'}<time datetime="${esc(record.startedAt)}">${esc(label)}</time></div><button class="delete-session" data-delete="${esc(record.id)}" aria-label="${esc('Delete '+length(record.seconds)+' session on '+label)}"${readError ? ' disabled' : ''}>Delete</button></li>`;
+    }).join('') : '<li class="card history-empty">No meditation sessions yet.</li>';
+  }
+  function renderHistory() { renderCalendar(); renderTracker(); renderSessions(); }
+  $('#historyList').addEventListener('click',event => {
+    const button = event.target.closest('[data-delete]');
+    if (!button || !read()) return;
+    const record = sessions.find(s => s.id===button.dataset.delete);
+    if (!record) { renderHistory(); return; }
+    if (!window.confirm(`Delete this ${length(record.seconds)} session from ${dateLabel(new Date(record.startedAt))}?`)) return;
+    // Read again after confirmation so changes from other tabs are preserved.
+    if (!read()) return;
+    const next = sessions.filter(s => s.id!==record.id);
+    try {
+      localStorage.setItem(KEY,JSON.stringify({version:1,sessions:next}));
+      sessions = next;
+      $('#status').textContent = pendingRecord ? 'Your new session still needs saving. Return to Timer and retry saving.' : 'Session deleted.';
+      renderHistory();
+      $('#historyTitle').focus();
+    } catch {
+      $('#status').textContent = 'Could not delete this session. Your saved history has not been changed. Please try again.';
+      renderHistory();
+    }
+  });
   document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click',() => {
     document.querySelectorAll('[data-view]').forEach(tab => {
       const active = tab===button; tab.setAttribute('aria-pressed',String(active)); $('#'+tab.dataset.view+'View').hidden = !active;

@@ -17,15 +17,16 @@
   <nav class="view-tabs" aria-label="Meditation views">
     <button data-view="timer" aria-pressed="true" aria-controls="timerView">Timer</button>
     <button data-view="calendar" aria-pressed="false" aria-controls="calendarView">Calendar</button>
+    <button data-view="history" aria-pressed="false" aria-controls="historyView">History</button>
     <button data-view="tracker" aria-pressed="false" aria-controls="trackerView">Tracker</button>
   </nav>
   <p id="status" class="status" role="status"></p>
   <section id="timerView" aria-label="Meditation timer">
     <form id="setup" class="card">
       <h2>Make time to pause.</h2>
-      <label>Warmup <span>seconds</span><input id="warmup" type="number" min="0" max="3600" step="1" value="60" required></label>
-      <label>Meditation <span>minutes</span><input id="duration" type="number" min="0.5" max="240" step="0.5" value="10" required></label>
-      <label>Bell interval <span>minutes · 0 for none</span><input id="interval" type="number" min="0" max="240" step="0.5" value="2" required></label>
+      <label>Warmup <span>seconds</span><input id="warmup" type="number" inputmode="numeric" min="0" max="3600" step="1" value="60" required></label>
+      <label>Meditation <span>minutes</span><input id="duration" type="number" inputmode="decimal" min="0.5" max="240" step="0.5" value="10" required></label>
+      <label>Bell interval <span>minutes · 0 for none</span><input id="interval" type="number" inputmode="decimal" min="0" max="240" step="0.5" value="2" required></label>
       <p class="hint">Gong at the start, halfway, and end. Soft bells between.</p>
       <div class="sound-preview"><button type="button" id="previewGong">Try gong</button><button type="button" id="previewBell">Try bell</button></div>
       <button class="primary full" type="submit">Begin session</button>
@@ -44,6 +45,10 @@
     <div class="calendar-meta"><p>Meditation time per day</p><button id="calendarToday">Today</button></div>
     <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Dates"></div>
     <section class="day-detail"><h2 id="dayTitle"></h2><div id="daySessions"></div></section>
+  </section>
+  <section id="historyView" aria-label="Meditation history" hidden>
+    <h2 id="historyTitle" tabindex="-1">Session history</h2>
+    <ul id="historyList" class="history-list"></ul>
   </section>
   <section id="trackerView" aria-label="Meditation totals" hidden>
     <div class="totals"><div class="card"><p>This week</p><strong id="weekTotal"></strong></div><div class="card"><p>This month</p><strong id="monthTotal"></strong></div><div class="card"><p>This year</p><strong id="yearTotal"></strong></div></div>

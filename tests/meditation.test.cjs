@@ -34,7 +34,7 @@ test('totals include partial sessions, multiple sessions per day, and only selec
   assert.equal(total(sessions,start,end),745);
 });
 
-function app({saved=null,failWrite=false,settings=null,audioSession={},clockStep=0}={}) {
+function app({saved=null,failWrite=false,settings=null,audioSession={},clockStep=0,confirmDelete=true}={}) {
   const nodes = new Map(), events = {}, timers = [];
   const storage = new Map(saved===null?[]:[['meditation.sessions.v1',saved]]);
   if (settings) storage.set('meditation.settings.v1',JSON.stringify(settings));
@@ -62,7 +62,7 @@ function app({saved=null,failWrite=false,settings=null,audioSession={},clockStep
     Date:Clock, Meditation:context.module.exports, crypto:{randomUUID:()=>String(now)}, navigator:{audioSession},
     localStorage:{getItem:k=>storage.get(k)??null,setItem(k,v){if(failWrite)throw Error();storage.set(k,v);}},
     document:{querySelector:get,querySelectorAll:()=>[],hidden:false,addEventListener:(k,fn)=>events[k]=fn},
-    window:{AudioContext:Audio,addEventListener:(k,fn)=>events[k]=fn},
+    window:{AudioContext:Audio,confirm:()=>confirmDelete,addEventListener:(k,fn)=>events[k]=fn},
     setInterval:fn=>{timers.push(fn);return timers.length;},clearInterval(){}
   };
   vm.runInNewContext(fs.readFileSync('apps/meditation/app.js','utf8'),sandbox);
@@ -131,4 +131,49 @@ test('audio interruptions immediately pause the timer until an explicit resume',
   a.advance(120); assert.equal(a.get('#remaining').textContent,'9:30');
   await a.click('#pause'); a.advance(30); a.click('#finish');
   assert.equal(a.records()[0].seconds,60);
+});
+
+function historyRecords() {
+  return {version:1,sessions:[
+    {id:'older',startedAt:new Date(2026,10,9,9).toISOString(),seconds:600,completed:true},
+    {id:'newer',startedAt:new Date(2026,10,10,12).toISOString(),seconds:120,completed:false}
+  ]};
+}
+function deleteSession(a,id) {
+  a.get('#historyList').listeners.click({target:{closest:()=>({dataset:{delete:id}})}});
+}
+test('history lists newest first and deletion persists and updates calendar and totals',()=>{
+  const a=app({saved:JSON.stringify(historyRecords())});
+  const html=a.get('#historyList').innerHTML;
+  assert.ok(html.indexOf('data-delete="newer"')<html.indexOf('data-delete="older"'));
+  assert.match(html,/partial/); assert.match(html,/12:00/);
+  deleteSession(a,'newer');
+  assert.deepEqual(a.records().map(s=>s.id),['older']);
+  assert.equal(a.get('#weekTotal').textContent,'10 min');
+  assert.match(a.get('#daySessions').innerHTML,/No meditation sessions/);
+  assert.doesNotMatch(a.get('#historyList').innerHTML,/data-delete="newer"/);
+  const b=app({saved:a.storage.get('meditation.sessions.v1')});
+  deleteSession(b,'older');
+  assert.match(b.get('#historyList').innerHTML,/No meditation sessions yet/);
+  assert.equal(b.get('#weekTotal').textContent,'0 min');
+});
+test('cancelled deletions and storage failures preserve all saved sessions',()=>{
+  const saved=JSON.stringify(historyRecords());
+  const a=app({saved,confirmDelete:false}); deleteSession(a,'newer');
+  assert.equal(a.storage.get('meditation.sessions.v1'),saved);
+  const b=app({saved,failWrite:true}); deleteSession(b,'newer');
+  assert.equal(b.storage.get('meditation.sessions.v1'),saved);
+  assert.match(b.get('#status').textContent,/Could not delete/);
+  assert.match(b.get('#historyList').innerHTML,/data-delete="newer"/);
+});
+test('deleting history preserves active timer and incorporates other tabs latest records',async()=>{
+  const a=app({saved:JSON.stringify(historyRecords())}); await a.start();
+  a.advance(90);
+  const changed=historyRecords(); changed.sessions.push({id:'other-tab',startedAt:new Date(2026,10,10,11).toISOString(),seconds:60,completed:true});
+  a.storage.set('meditation.sessions.v1',JSON.stringify(changed));
+  deleteSession(a,'newer');
+  assert.deepEqual(a.records().map(s=>s.id),['older','other-tab']);
+  a.advance(30); a.click('#finish');
+  assert.equal(a.records().length,3);
+  assert.equal(a.records().at(-1).seconds,60);
 });

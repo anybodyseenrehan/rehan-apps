@@ -27,3 +27,12 @@ select { padding: 10px; background: var(--surface); color: #f0f2ee; border: 1px 
 .bar-row span:last-child { text-align: right; color: var(--muted); }
 .bar-track { height: 6px; background: var(--line); border-radius: 8px; overflow: hidden; }
 .bar-fill { display: block; height: 100%; background: var(--sage); border-radius: inherit; }
+
+.history-list { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 10px; }
+.history-session { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px; }
+.history-session strong { font-size: 18px; font-weight: 550; }
+.history-session small { color: var(--muted); font-size: 12px; }
+.history-session time { display: block; margin-top: 7px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.app-shell .delete-session { color: var(--danger); flex-shrink: 0; background: transparent; }
+.history-empty { padding: 22px; color: var(--muted); font-size: 14px; }
+@media (max-width: 370px) { .view-tabs button { padding: 10px 8px; font-size: 13px; } }
