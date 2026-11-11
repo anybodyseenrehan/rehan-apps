@@ -66,8 +66,8 @@
   }
   // Inharmonic partials and long decays create two distinct, gentle struck-metal sounds.
   function strike(kind, when = audio.currentTime) {
-    const gong = kind === 'gong', base = gong ? 196 : 528;
-    const partials = gong ? [1,1.48,2.03,2.62,3.91,5.42] : [1,2.76,5.4];
+    const gong = kind === 'gong', base = gong ? 196 : 330;
+    const partials = gong ? [1,1.48,2.03,2.62,3.91,5.42] : [1,2.2,3.6];
     partials.forEach((ratio,i) => {
       const oscillator = audio.createOscillator(), gain = audio.createGain();
       oscillator.type = 'sine';
