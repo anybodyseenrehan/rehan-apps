@@ -5,6 +5,7 @@ export const root = fileURLToPath(new URL('../', import.meta.url));
 export const stagingRoot = resolve(root, '.app-source');
 // Keep existing public URLs independent of the source folder layout.
 export const pages = {
+  'halifax/index.html': 'apps/halifax/index.html',
   'index.html': 'index.html',
   'workout/index.html': 'apps/workout/index.html',
   'meditation/index.html': 'apps/meditation/index.html',
@@ -13,6 +14,8 @@ export const pages = {
   'drone/index.html': 'apps/drone/index.html',
 };
 export const assets = {
+  'halifax.js': 'apps/halifax/app.js',
+  'halifax.css': 'apps/halifax/styles.css',
   'app-theme.css': 'shared/theme.css',
   'hub.webmanifest': 'shared/hub.webmanifest',
   'hub-icon.png': 'shared/assets/hub-icon.png',
