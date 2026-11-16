@@ -1,7 +1,14 @@
 'use strict';
 const KEY='push-workout-log-v1';
-const NAMES={rear:'Rear Delt Pulls',bench:'Flat Bench',triceps:'Tricep Extensions',flies:'Chest Flies',delts:'Side Delt Raises',plank:'Plank',flexor:'Flexor Curls',reverse:'Reverse Wrist Curls',overhead:'Overhead Tricep Ext',lat:'Lat Pulldown',biceps:'Bicep Curl',rows:'Rows',back:'Back Extensions',backHold:'Back Extensions · Static',hammer:'Hammer Curls',abs:'Abs',press:'Leg Press',calf:'Calf Raises',curl:'Leg Curls',glute:'Glute Leans',abduction:'Hip Abductions',adduction:'Hip Adductions',extension:'Leg Extensions',rdl:'Romanian Deadlifts',thrust:'Hip Thrusts'};
-const ROUTINES={push1:[['rear'],['bench'],['triceps'],['flies'],['delts'],['plank']],push2:[['bench'],['triceps'],['flexor','reverse'],['delts'],['overhead']],pull1:[['lat'],['biceps'],['rows'],['flexor','reverse'],['back']],pull2:[['lat'],['biceps'],['hammer'],['back'],['abs']],legs1:[['press','calf'],['curl'],['glute'],['abduction','adduction'],['extension']],legs2:[['press','calf'],['rdl'],['thrust'],['curl']]};
+const NAMES={rear:'Rear Delt Pulls',bench:'Flat Bench',triceps:'Tricep Extensions',flies:'Chest Flies',delts:'Side Delt Raises',plank:'Plank',flexor:'Flexor Curls',reverse:'Reverse Wrist Curls',overhead:'Overhead Tricep Ext',lat:'Lat Pulldown',biceps:'Bicep Curl',rows:'Rows',back:'Back Extensions',backHold:'Back Extensions · Static',hammer:'Hammer Curls',abs:'Abs',press:'Leg Press',calf:'Calf Raises',curl:'Leg Curls',glute:'Glute Leans',abduction:'Hip Abductions',adduction:'Hip Adductions',extension:'Leg Extensions',rdl:'Romanian Deadlifts',thrust:'Hip Thrusts',overheadBarbell:'Overhead Barbell Tricep Extensions'};
+const ROUTINES={
+push1:[['bench'],['triceps'],['flies'],['delts'],['plank']],
+push2:[['bench'],['triceps'],['flexor','reverse'],['delts'],['overheadBarbell']],
+pull1:[['lat'],['biceps'],['rows'],['flexor','reverse'],['back']],
+pull2:[['lat'],['biceps'],['rear'],['hammer'],['back']],
+legs1:[['press','calf'],['curl'],['glute'],['extension'],['abduction','adduction']],
+legs2:[['press','calf'],['rdl'],['abs'],['curl']]
+};
 const CYCLE=['push1','legs1','pull1','rest1','push2','legs2','pull2','rest2'];
 let db={schemaVersion:3,workouts:[],active:null,restAfter:null},tab='train',group=null,timer=null,result=null,readError=false;
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
