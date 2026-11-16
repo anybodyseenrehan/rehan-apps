@@ -54,3 +54,16 @@ assert.equal(a.run("isRestDay('2020-01-03')"),true);
 assert.equal(a.run("isRestDay(dayKey(new Date()))"),false);
 assert.equal(a.run("new Set(['push1','push2','pull1','pull2','legs1','legs2'].map(calendarClass)).size"),6);
 });
+
+test('skip rest advances the suggestion without starting or recording a session',()=>{
+const a=app();
+a.run("start('pull1');db.active.treadmill.done=true;finish();result=null;show()");
+assert.equal(a.run('next()'),'rest1');
+assert.equal(a.run('skipRestDay()'),true);
+assert.equal(a.run('next()'),'push2');
+assert.equal(a.run('db.active'),null);
+assert.equal(a.run('db.workouts.length'),1);
+assert.equal(a.run('(db.restDays||[]).length'),0);
+const b=app(a.raw());
+assert.equal(b.run('next()'),'push2');
+});
